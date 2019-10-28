@@ -115,10 +115,20 @@ def main(gen_update_time ,debug ,steamcmdpath,mods_install ,ModsName ,Mods,ModDo
             except Exception as e:
                 update_time[workshopid] = ""
 
-            update_time1 = get_update_time(workshopid)
+            try:
+                update_time1 = get_update_time(workshopid)
+            except Exception as e:
+                try:
+                    update_time1 = get_update_time(workshopid)
+                except Exception as e:
+                    print(ModsName[idx],"not get update_time")
+            
             print(ModsName[idx],"get update_time",update_time1)
 
-            if(update_time[workshopid]!=update_time1 and not gen_update_time or (idx==0 and debug)):
+            if(debug):
+                input("waite")
+
+            if(update_time[workshopid]!=update_time1 and update_time1!="" and not gen_update_time or (idx==0 and debug)):
                 
                 print("getting Mod:",ModsName[idx])
                 cmd = steamcmdpath+"\\steamcmd +login teluwl Pan7777777 +force_install_dir \""+mods_install+"\" +\"workshop_download_item 440900 "+str(workshopid)+"\" +quit "
@@ -255,6 +265,9 @@ def get_update_time(id):
 
     response = urllib.request.urlopen(req)
     html = response.read().decode()
+
+    return html
+    '''
     #html = urlopen( get_video_url(vid) ).read().decode()
     #"author":{"uid":"93957793296"
     start =  html.find('更新日期')
@@ -267,6 +280,7 @@ def get_update_time(id):
     if(len(update_time)>40):
             update_time = ""
     return update_time
+    '''
 
 def run_cmd(cmd):
     cmd +='\nexit'

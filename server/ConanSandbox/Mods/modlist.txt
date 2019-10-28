@@ -1,0 +1,11 @@
+*Pippi.pak
+*TheColdEmbrace-Main.pak
+*DungeonMasterTools.pak
+*300.pak
+*RA.pak
+*Improved_Quality_of_Life.pak
+*ExilesExtreme.pak
+*StylistPlus.pak
+*LitManItemStackAndContainerSize.pak
+*Tutorial.pak
+*EEWAExtraFeatLightsabers.pak
