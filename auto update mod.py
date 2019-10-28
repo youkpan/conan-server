@@ -23,7 +23,7 @@ else:
 gen_update_time = False #False 
 debug = False
 
-steamcmdpath = "C:\\conan"
+steamcmdpath = "D:\\conan"
 mods_install = steamcmdpath+"\\Mods"
 
 ModsName = {}
@@ -235,8 +235,13 @@ def save_file(name,data):
 
 def get_update_time(id):
 
-    url = ('https://steamcommunity.com/sharedfiles/filedetails/?id=%d'%(id))
+    #url = "http://mysea.hayoou.com/curl.php?url="+urllib.parse.quote('https://steamcommunity.com/sharedfiles/filedetails/?id=%d'%(id), safe='/', encoding=None, errors=None)
+    #print(url)
+    url = 'https://steamcommunity.com/sharedfiles/filedetails/?id=%d'%(id)
     print(url)
+    url = "http://mysea.hayoou.com/curl.php?steam_update_time=1&id=%d"%(id)
+    print(url)
+
     user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36'
     values ={}
     data = urllib.parse.urlencode(values)
@@ -363,4 +368,4 @@ while True:
     try:
         main(gen_update_time ,debug ,steamcmdpath,mods_install ,ModsName ,Mods,ModDownload )
     except Exception as e:
-        pass
+        print(e)
