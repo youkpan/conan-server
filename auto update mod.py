@@ -23,15 +23,13 @@ else:
 gen_update_time = False #False 
 debug = False
 
-
 steamcmdpath = "C:\\conan"
 mods_install = steamcmdpath+"\\Mods"
-
 
 ModsName = {}
 Mods = {}
 ModDownload = {}
-
+    
 ModsName[0]="Improved_Quality_of_Life"
 Mods[0]=1657730588
 ModDownload[0]=True
@@ -84,6 +82,109 @@ ModDownload[9]=True
 ModsName[10]="StylistPlus"
 Mods[10]=1159180273
 ModDownload[10]=True 
+
+
+def main(gen_update_time ,debug ,steamcmdpath,mods_install ,ModsName ,Mods,ModDownload ):
+    update_time = get_data("update_time",{})
+    print("update_time",update_time)
+    #update_time = {}
+    for idx in update_time.keys():
+        print(idx,"update_time",update_time[idx])
+
+    proc = 0
+    #re = stop_game_server(proc)
+    if True or debug  :
+        proc = start_game_server(steamcmdpath,proc)
+        time.sleep(10)
+
+    hours_count = 0
+    while(True):
+
+        has_mod_update = False
+        if debug:
+            has_mod_update = True
+        after_cmd = ""
+        modlistfile = ""
+
+        for idx in ModsName.keys():
+            workshopid= Mods[idx]
+            print("-------------",str(idx))
+            try:
+                t=update_time[workshopid]
+                print(ModsName[idx],"last update_time",t)
+            except Exception as e:
+                update_time[workshopid] = ""
+
+            update_time1 = get_update_time(workshopid)
+            print(ModsName[idx],"get update_time",update_time1)
+
+            if(update_time[workshopid]!=update_time1 and not gen_update_time or (idx==0 and debug)):
+                
+                print("getting Mod:",ModsName[idx])
+                cmd = steamcmdpath+"\\steamcmd +login teluwl Pan7777777 +force_install_dir \""+mods_install+"\" +\"workshop_download_item 440900 "+str(workshopid)+"\" +quit "
+                out = run_cmd(cmd)
+                if out.find("Success. Downloaded item")>0:
+                    print(" download ",ModsName[idx]," Success !!")
+                    after_cmd += "copy /Y "+mods_install+"\\steamapps\\workshop\\content\\440900\\"+str(workshopid)+"\\"+ModsName[idx]+".pak "+steamcmdpath+"\\server\\ConanSandbox\\Mods\\ \n"
+                    
+                    update_time[workshopid] = update_time1
+                    save_data("update_time",update_time)
+                    has_mod_update = True    
+                else:
+                    print("not download ",ModsName[idx],"!!")
+
+            if gen_update_time:
+                update_time[workshopid] = update_time1
+                save_data("update_time",update_time)
+
+            modlistfile += "*"+mods_install+"\\steamapps\\workshop\\content\\440900\\"+str(workshopid)+"\\"+ModsName[idx]+".pak\n"
+
+        save_file("modlist.txt",modlistfile.encode())
+        #print("please copy save/modlist.txt to "+steamcmdpath+"\\server\\ConanSandbox\\Mods\\")
+
+        if(has_mod_update):
+            shut_down_cmd = ""
+            #win32api.GenerateConsoleCtrlEvent(win32con.CTRL_C_EVENT, pid)
+            re = stop_game_server(proc)
+            if re==0:
+                print("stop_game_server error")
+            time.sleep(10)
+            print("after_cmd",after_cmd)
+            run_cmd(after_cmd)
+            print("start_game_server")
+            #input()
+
+        window = find_game_window()
+        if window==0:
+            proc = start_game_server(steamcmdpath,proc)
+
+        if not debug and not gen_update_time:
+            time.sleep(3600)
+
+        hours_count+=1
+
+        hour =datetime.now().hour 
+        if debug or gen_update_time or hours_count %4==3 and (hour >= 3 and hour <=7 or hour >= 15 and hour <=19) :
+
+            game_info,game_update_time = get_game_info(steamcmdpath,443030)
+            #print(game_info)
+            print("game_update_time",game_update_time)
+
+            if gen_update_time:
+                update_time[443030] = game_update_time
+                save_data("update_time",update_time)
+
+            if debug or update_time[443030] != game_update_time:
+                update_time[443030] = game_update_time
+                save_data("update_time",update_time)
+                #input()
+                re = stop_game_server(proc)
+                #update server
+                proc =start_game_server(steamcmdpath,proc) 
+
+        gen_update_time = False
+
+
 
 
 def _MyCallback( hwnd, extra ):
@@ -257,103 +358,9 @@ def stop_game_server(proc,waitstop=True):
 def get_server_pid():
     cmd = "tasklist /FI \"IMAGENAME eq \"ConanSandboxServer-Win64-Test.exe\"\" "
 
-#
-update_time = get_data("update_time",{})
-print("update_time",update_time)
-#update_time = {}
-for idx in update_time.keys():
-    print(idx,"update_time",update_time[idx])
-
-proc = 0
-#re = stop_game_server(proc)
-if True or debug  :
-    proc = start_game_server(steamcmdpath,proc)
-    time.sleep(10)
-
-hours_count = 0
-while(True):
-
-    has_mod_update = False
-    if debug:
-        has_mod_update = True
-    after_cmd = ""
-    modlistfile = ""
-
-    for idx in ModsName.keys():
-        workshopid= Mods[idx]
-        print("-------------",str(idx))
-        try:
-            t=update_time[workshopid]
-            print(ModsName[idx],"last update_time",t)
-        except Exception as e:
-            update_time[workshopid] = ""
-
-        update_time1 = get_update_time(workshopid)
-        print(ModsName[idx],"get update_time",update_time1)
-
-        if(update_time[workshopid]!=update_time1 and not gen_update_time or (idx==0 and debug)):
-            
-            print("getting Mod:",ModsName[idx])
-            cmd = steamcmdpath+"\\steamcmd +login teluwl Pan7777777 +force_install_dir \""+mods_install+"\" +\"workshop_download_item 440900 "+str(workshopid)+"\" +quit "
-            out = run_cmd(cmd)
-            if out.find("Success. Downloaded item")>0:
-                print(" download ",ModsName[idx]," Success !!")
-                after_cmd += "copy /Y "+mods_install+"\\steamapps\\workshop\\content\\440900\\"+str(workshopid)+"\\"+ModsName[idx]+".pak "+steamcmdpath+"\\server\\ConanSandbox\\Mods\\ \n"
-                
-                update_time[workshopid] = update_time1
-                save_data("update_time",update_time)
-                has_mod_update = True    
-            else:
-                print("not download ",ModsName[idx],"!!")
-
-        if gen_update_time:
-            update_time[workshopid] = update_time1
-            save_data("update_time",update_time)
-
-        modlistfile += "*"+mods_install+"\\steamapps\\workshop\\content\\440900\\"+str(workshopid)+"\\"+ModsName[idx]+".pak\n"
-
-    save_file("modlist.txt",modlistfile.encode())
-    #print("please copy save/modlist.txt to "+steamcmdpath+"\\server\\ConanSandbox\\Mods\\")
-
-    if(has_mod_update):
-        shut_down_cmd = ""
-        #win32api.GenerateConsoleCtrlEvent(win32con.CTRL_C_EVENT, pid)
-        re = stop_game_server(proc)
-        if re==0:
-            print("stop_game_server error")
-        time.sleep(10)
-        print("after_cmd",after_cmd)
-        run_cmd(after_cmd)
-        print("start_game_server")
-        #input()
-
-    window = find_game_window()
-    if window==0:
-        proc = start_game_server(steamcmdpath,proc)
-
-    if not debug and not gen_update_time:
-        time.sleep(3600)
-
-    hours_count+=1
-
-    hour =datetime.now().hour 
-    if debug or gen_update_time or hours_count %4==3 and (hour >= 3 and hour <=7 or hour >= 15 and hour <=19) :
-
-        game_info,game_update_time = get_game_info(steamcmdpath,443030)
-        #print(game_info)
-        print("game_update_time",game_update_time)
-
-        if gen_update_time:
-            update_time[443030] = game_update_time
-            save_data("update_time",update_time)
-
-        if debug or update_time[443030] != game_update_time:
-            update_time[443030] = game_update_time
-            save_data("update_time",update_time)
-            #input()
-            re = stop_game_server(proc)
-            #update server
-            proc =start_game_server(steamcmdpath,proc) 
-
-    gen_update_time = False
-
+while True:
+  
+    try:
+        main(gen_update_time ,debug ,steamcmdpath,mods_install ,ModsName ,Mods,ModDownload )
+    except Exception as e:
+        pass
