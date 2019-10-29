@@ -116,7 +116,7 @@ call set "name=%%ModsName[%x%]%%"
 call set "id=%%Mods[%x%]%%"
 call set "downloads=%%ModDownload[%x%]%%"
 if "%downloads%"=="true" (
-cls
+
 echo Downloading the Mod: %name% - ID: %id%
 echo.
 ::pause
