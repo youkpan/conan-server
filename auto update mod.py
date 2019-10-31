@@ -23,7 +23,7 @@ else:
 gen_update_time = False #False 
 debug = False
 
-steamcmdpath = "D:\\conan"
+steamcmdpath = "C:\\conan"
 mods_install = steamcmdpath+"\\Mods"
 
 ModsName = {}
@@ -135,10 +135,10 @@ def main(gen_update_time ,debug ,steamcmdpath,mods_install ,ModsName ,Mods,ModDo
                 out = run_cmd(cmd)
                 if out.find("Success. Downloaded item")>0:
                     print(" download ",ModsName[idx]," Success !!")
-                    after_cmd += "copy /Y "+mods_install+"\\steamapps\\workshop\\content\\440900\\"+str(workshopid)+"\\"+ModsName[idx]+".pak "+steamcmdpath+"\\server\\ConanSandbox\\Mods\\ \n"
+                    after_cmd += "move /Y "+mods_install+"\\steamapps\\workshop\\content\\440900\\"+str(workshopid)+"\\"+ModsName[idx]+".pak "+steamcmdpath+"\\server\\ConanSandbox\\Mods\\ \n"
                     
                     update_time[workshopid] = update_time1
-                    save_data("update_time",update_time)
+                    
                     has_mod_update = True    
                 else:
                     print("not download ",ModsName[idx],"!!")
@@ -147,7 +147,7 @@ def main(gen_update_time ,debug ,steamcmdpath,mods_install ,ModsName ,Mods,ModDo
                 update_time[workshopid] = update_time1
                 save_data("update_time",update_time)
 
-            modlistfile += "*"+mods_install+"\\steamapps\\workshop\\content\\440900\\"+str(workshopid)+"\\"+ModsName[idx]+".pak\n"
+            modlistfile += mods_install+"\\steamapps\\workshop\\content\\440900\\"+str(workshopid)+"\\"+ModsName[idx]+".pak\n"
 
         save_file("modlist.txt",modlistfile.encode())
         #print("please copy save/modlist.txt to "+steamcmdpath+"\\server\\ConanSandbox\\Mods\\")
@@ -162,6 +162,7 @@ def main(gen_update_time ,debug ,steamcmdpath,mods_install ,ModsName ,Mods,ModDo
             print("after_cmd",after_cmd)
             run_cmd(after_cmd)
             print("start_game_server")
+            save_data("update_time",update_time)
             #input()
 
         window = find_game_window()
@@ -352,9 +353,11 @@ def stop_game_server(proc,waitstop=True):
             while window>0:
                 time.sleep(20)
                 window = find_game_window()
-                if count % 10 == 9:
+                if count % 20 == 19:
                     press_ctrl_c(window)
                 count +=1
+                #if count >40:
+                #    os.kill(window)
     except:
         pass
 
@@ -383,3 +386,4 @@ while True:
         main(gen_update_time ,debug ,steamcmdpath,mods_install ,ModsName ,Mods,ModDownload )
     except Exception as e:
         print(e)
+        #raise e
