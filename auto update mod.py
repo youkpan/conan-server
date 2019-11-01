@@ -184,14 +184,25 @@ def main(gen_update_time ,debug ,steamcmdpath,mods_install ,ModsName ,Mods,ModDo
             if gen_update_time:
                 update_time[443030] = game_update_time
                 save_data("update_time",update_time)
+            try:
+                t = update_time[443030]
+            except Exception as e:
+                update_time[443030] = game_update_time
+                save_data("update_time",update_time)
 
-            if debug or update_time[443030] != game_update_time:
+            if debug or update_time[443030] != game_update_time and  game_update_time!='':
                 update_time[443030] = game_update_time
                 save_data("update_time",update_time)
                 #input()
                 re = stop_game_server(proc)
                 #update server
                 proc =start_game_server(steamcmdpath,proc) 
+
+        if (hour == 4 or debug):
+            print("restart server at 4 am")
+            re = stop_game_server(proc)
+            #update server
+            proc =start_game_server(steamcmdpath,proc) 
 
         gen_update_time = False
 
@@ -290,7 +301,11 @@ def run_cmd(cmd):
     #p = os.popen(".\\save\\updatemod.bat")
 
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
-    info = p.stdout.read().decode()
+    try:
+        info = p.stdout.read().decode()
+    except Exception as e:
+        info = p.stdout.read()
+    
     return info
     #print(str(p.read().decode()) )
     #print("please input :")
@@ -312,9 +327,10 @@ def start_game_server(steamcmdpath,proc):
     if window>0:
         return proc
     proc= 0 
+    info = run_cmd("cd C:\\conan\\server\\ConanSandbox\\Saved && .\\sqlite3.exe game.db \"update buildable_health set health_percentage=1 where object_id in ( SELECT object_id FROM buildings where owner_id=(SELECT guildId from guilds where name='GM') )\" " )
     info = run_cmd(steamcmdpath + "\\steamcmd +login anonymous +force_install_dir \"C:\\conan\\server\" +app_update 443030 +quit")
     print(info,"starting ConanSandboxServer")
-    proc = subprocess.Popen(steamcmdpath + "\\server\\ConanSandboxServer.exe -log ", stdin=subprocess.PIPE)
+    proc = subprocess.Popen(steamcmdpath + "\\server\\ConanSandboxServer.exe -log -MaxPlayers=70 ", stdin=subprocess.PIPE)
     return proc
 
 def press_ctrl_c(window):
@@ -386,4 +402,4 @@ while True:
         main(gen_update_time ,debug ,steamcmdpath,mods_install ,ModsName ,Mods,ModDownload )
     except Exception as e:
         print(e)
-        #raise e
+        raise e
