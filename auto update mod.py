@@ -83,6 +83,9 @@ ModsName[10]="StylistPlus"
 Mods[10]=1159180273
 ModDownload[10]=True 
 
+ModsName[11]="hayoou_hunting"
+Mods[11]=1903713454
+ModDownload[11]=True 
 
 def main(gen_update_time ,debug ,steamcmdpath,mods_install ,ModsName ,Mods,ModDownload ):
     update_time = get_data("update_time",{})
@@ -93,7 +96,7 @@ def main(gen_update_time ,debug ,steamcmdpath,mods_install ,ModsName ,Mods,ModDo
 
     proc = 0
     #re = stop_game_server(proc)
-    if True or debug  :
+    if False or debug  :
         proc = start_game_server(steamcmdpath,proc)
         time.sleep(10)
 
@@ -192,11 +195,11 @@ def main(gen_update_time ,debug ,steamcmdpath,mods_install ,ModsName ,Mods,ModDo
 
             if debug or update_time[443030] != game_update_time and  game_update_time!='':
                 update_time[443030] = game_update_time
-                save_data("update_time",update_time)
                 #input()
                 re = stop_game_server(proc)
                 #update server
                 proc =start_game_server(steamcmdpath,proc) 
+                save_data("update_time",update_time)
 
         if (hour == 4 or debug):
             print("restart server at 4 am")
@@ -346,7 +349,11 @@ def press_ctrl_c(window):
     win32api.keybd_event(0x11, 0, win32con.KEYEVENTF_KEYUP, 0)
 
 def find_game_window():
-    return find_window("- Conan Exiles - press Ctrl+C to shutdown")
+    try:
+        return find_window("- Conan Exiles - press Ctrl+C to shutdown")
+    except Exception as e:
+        return 0
+    
 
 def stop_game_server(proc,waitstop=True):
     print ("stop_game_server sending ctrl c")   
