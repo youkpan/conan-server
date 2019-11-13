@@ -32,60 +32,60 @@ ModDownload = {}
     
 ModsName[0]="Improved_Quality_of_Life"
 Mods[0]=1657730588
-ModDownload[0]=True
+ModDownload[0]=False
 
 
 ModsName[1]="TheColdEmbrace-Main"
 Mods[1]=1113901982
-ModDownload[1]=True
+ModDownload[1]=False
 
 
 ModsName[2]="LitManItemStackAndContainerSize"
 Mods[2]=1125427722
-ModDownload[2]=True
+ModDownload[2]=False
 
 ModsName[3]="300"
 Mods[3]=1386174080
-ModDownload[3]=True
+ModDownload[3]=False
 
 
 ##MASSI MODS
 
 ModsName[4]="RA"
 Mods[4]=1542041983
-ModDownload[4]=True
+ModDownload[4]=False
 
 ModsName[5]="Pippi"
 Mods[5]=880454836
-ModDownload[5]=True
+ModDownload[5]=False
 
 
 ModsName[6]="DungeonMasterTools"
 Mods[6]=1699858371
-ModDownload[6]=True
+ModDownload[6]=False
 
 
 ModsName[7]="Tutorial"
 Mods[7]=1734383367
-ModDownload[7]=True
+ModDownload[7]=False
 
 
 ModsName[8]="NumericHUD"
 Mods[8]=1753303494
-ModDownload[8]=True
+ModDownload[8]=False
 
 
 ModsName[9]="EEWAExtraFeatLightsabers"
 Mods[9]=1795327310
-ModDownload[9]=True 
+ModDownload[9]=False 
 
 ModsName[10]="StylistPlus"
 Mods[10]=1159180273
-ModDownload[10]=True 
+ModDownload[10]=False 
 
 ModsName[11]="hayoou_hunting"
 Mods[11]=1903713454
-ModDownload[11]=True 
+ModDownload[11]=False 
 
 def main(gen_update_time ,debug ,steamcmdpath,mods_install ,ModsName ,Mods,ModDownload ):
     update_time = get_data("update_time",{})
@@ -131,8 +131,8 @@ def main(gen_update_time ,debug ,steamcmdpath,mods_install ,ModsName ,Mods,ModDo
             if(debug):
                 input("waite")
 
-            if(update_time[workshopid]!=update_time1 and update_time1!="" and not gen_update_time or (idx==0 and debug)):
-                
+            if(ModDownload[idx] or update_time[workshopid]!=update_time1 and update_time1!="" and not gen_update_time or (idx==0 and debug)):
+                ModDownload[idx] = False
                 print("getting Mod:",ModsName[idx])
                 cmd = steamcmdpath+"\\steamcmd +login teluwl Pan7777777 +force_install_dir \""+mods_install+"\" +\"workshop_download_item 440900 "+str(workshopid)+"\" +quit "
                 out = run_cmd(cmd)
